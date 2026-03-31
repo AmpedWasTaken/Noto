@@ -1,9 +1,16 @@
-import { useCallback, useEffect, useRef, type ChangeEvent, type PointerEvent as ReactPointerEvent } from 'react'
-import type { Note, NoteType } from '@shared/note-types'
-import { useNoteStore } from '@/store/note-store'
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type PointerEvent as ReactPointerEvent
+} from 'react'
+import type { Note } from '@shared/note-types'
+import { ConfirmDialog } from '@/components/ConfirmDialog'
+import { PencilIcon } from '@/components/icons/PencilIcon'
 import { NoteChecklist } from '@/features/notes/NoteChecklist'
-import { ReminderBar } from '@/features/reminders/ReminderBar'
-import { noteAccentClass } from './note-theme'
+import { useNoteStore } from '@/store/note-store'
 
 type Props = {
   note: Note
@@ -22,6 +29,17 @@ function clamp(n: number, lo: number, hi: number): number {
 export function NoteCard({ note }: Props) {
   const updateNote = useNoteStore((s) => s.updateNote)
   const removeNote = useNoteStore((s) => s.removeNote)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+
+  useEffect(() => {
+    if (!confirmDelete) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setConfirmDelete(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [confirmDelete])
+
   const dragRef = useRef<{
     startX: number
     startY: number
@@ -39,13 +57,6 @@ export function NoteCard({ note }: Props) {
   const onChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
       updateNote(note.id, { content: e.target.value })
-    },
-    [note.id, updateNote]
-  )
-
-  const onTypeChange = useCallback(
-    (e: ChangeEvent<HTMLSelectElement>) => {
-      updateNote(note.id, { type: e.target.value as NoteType })
     },
     [note.id, updateNote]
   )
@@ -139,9 +150,14 @@ export function NoteCard({ note }: Props) {
     }
   }
 
+  const handleDelete = useCallback(() => {
+    removeNote(note.id)
+    setConfirmDelete(false)
+  }, [note.id, removeNote])
+
   return (
     <div
-      className={`pointer-events-auto absolute flex flex-col overflow-hidden rounded-xl border border-white/10 bg-[#1e222c] shadow-noto transition-shadow duration-200 ease-out hover:shadow-lg ${noteAccentClass(note.type)} border-l-[3px]`}
+      className="pointer-events-auto absolute flex flex-col overflow-hidden rounded-xl border border-white/10 border-l-[3px] border-l-slate-500/70 bg-[#1e222c] shadow-noto transition-shadow duration-200 ease-out hover:shadow-lg"
       style={{
         left: note.x,
         top: note.y,
@@ -150,28 +166,19 @@ export function NoteCard({ note }: Props) {
       }}
     >
       <header
-        className="flex shrink-0 cursor-grab select-none items-center gap-2 border-b border-white/10 bg-[#232730] px-2 py-2 pl-3 active:cursor-grabbing"
+        className="flex shrink-0 cursor-grab select-none items-center gap-2 border-b border-white/10 bg-[#232730] px-2 py-2 active:cursor-grabbing"
         onPointerDown={onHeaderPointerDown}
       >
-        <span className="min-w-0 flex-1 text-[11px] font-medium uppercase tracking-wider text-noto-muted">
-          Noto
+        <span className="flex shrink-0 items-center justify-center text-noto-muted" title="Note">
+          <PencilIcon className="h-4 w-4" />
         </span>
-        <select
-          className="max-w-[88px] shrink-0 cursor-pointer rounded bg-white/[0.06] px-1.5 py-0.5 text-[10px] text-noto-text focus:outline-none"
-          value={note.type}
-          onChange={onTypeChange}
-          onPointerDown={(e) => e.stopPropagation()}
-        >
-          <option value="work">Work</option>
-          <option value="idea">Idea</option>
-          <option value="reminder">Reminder</option>
-        </select>
+        <span className="min-w-0 flex-1" />
         <button
           type="button"
           title="Remove note"
-          className="shrink-0 rounded px-2 py-0.5 text-[13px] leading-none text-noto-muted hover:bg-red-500/20 hover:text-red-200"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-lg leading-none text-noto-muted hover:bg-red-500/20 hover:text-red-200"
           onPointerDown={(e) => e.stopPropagation()}
-          onClick={() => removeNote(note.id)}
+          onClick={() => setConfirmDelete(true)}
         >
           ×
         </button>
@@ -184,22 +191,19 @@ export function NoteCard({ note }: Props) {
         onChange={onChange}
       />
       <NoteChecklist note={note} />
-      <ReminderBar note={note} />
-      {/* Bottom edge — change height */}
+
       <button
         type="button"
         aria-label="Resize height"
         className="absolute bottom-0 left-0 right-6 h-2 cursor-ns-resize touch-none bg-transparent"
         onPointerDown={startResize('s')}
       />
-      {/* Right edge — change width */}
       <button
         type="button"
         aria-label="Resize width"
         className="absolute right-0 top-0 bottom-6 w-2 cursor-ew-resize touch-none bg-transparent"
         onPointerDown={startResize('e')}
       />
-      {/* Corner — change width and height */}
       <button
         type="button"
         aria-label="Resize note"
@@ -211,6 +215,17 @@ export function NoteCard({ note }: Props) {
           aria-hidden
         />
       </button>
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title="Remove note?"
+        message="This note will be deleted. You can’t undo this."
+        confirmLabel="Remove"
+        cancelLabel="Cancel"
+        danger
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmDelete(false)}
+      />
     </div>
   )
 }

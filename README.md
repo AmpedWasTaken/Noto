@@ -30,7 +30,7 @@ Press **Ctrl+Shift+H** to hide or show the Noto window, or use the **Hide** cont
 
 ### Notes UI
 
-Drag a note by its header. Resize using the **bottom edge** (height), **right edge** (width), or the **bottom-right corner** (both). Remove a note with **×** in the header.
+Drag a note by its header. Resize using the **bottom edge** (height), **right edge** (width), or the **bottom-right corner** (both). Close a note with **×** — you’ll be asked to confirm before it’s removed.
 
 ### Data
 
