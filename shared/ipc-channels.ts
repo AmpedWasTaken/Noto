@@ -12,3 +12,9 @@ export const IPC = {
 } as const
 
 export type IpcChannel = (typeof IPC)[keyof typeof IPC]
+
+/** Main → renderer one-way events (use preload subscriptions). */
+export const IPC_EVENTS = {
+  QUICK_ADD: 'noto:quick-add',
+  REMINDER_DUE: 'noto:reminder-due'
+} as const

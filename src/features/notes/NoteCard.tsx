@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, type ChangeEvent, type PointerEvent as ReactPointerEvent } from 'react'
 import type { Note, NoteType } from '@shared/note-types'
 import { useNoteStore } from '@/store/note-store'
+import { ReminderBar } from '@/features/reminders/ReminderBar'
 import { noteAccentClass } from './note-theme'
 
 type Props = {
@@ -161,6 +162,7 @@ export function NoteCard({ note }: Props) {
         value={note.content}
         onChange={onChange}
       />
+      <ReminderBar note={note} />
       <button
         type="button"
         aria-label="Resize note"

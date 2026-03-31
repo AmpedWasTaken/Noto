@@ -1,0 +1,46 @@
+import { Notification, type BrowserWindow } from 'electron'
+import type { Note } from '@shared/note-types'
+import { IPC_EVENTS } from '@shared/ipc-channels'
+
+let notesRef: Note[] = []
+const cooling = new Set<string>()
+
+export function setNotesForReminders(next: Note[]): void {
+  notesRef = next
+}
+
+let timer: ReturnType<typeof setInterval> | null = null
+
+export function startReminderScheduler(getWindow: () => BrowserWindow | null): void {
+  if (timer) return
+  timer = setInterval(() => {
+    tick(getWindow)
+  }, 45_000)
+  tick(getWindow)
+}
+
+function tick(getWindow: () => BrowserWindow | null): void {
+  const now = Date.now()
+  for (const note of notesRef) {
+    if (!note.reminder) continue
+    const due = new Date(note.reminder.snoozedUntil ?? note.reminder.at).getTime()
+    if (due > now) continue
+    if (cooling.has(note.id)) continue
+    cooling.add(note.id)
+    setTimeout(() => cooling.delete(note.id), 5000)
+
+    const body = note.content.trim().slice(0, 140) || 'Reminder'
+    if (Notification.isSupported()) {
+      const n = new Notification({ title: 'Noto', body })
+      n.show()
+    }
+
+    const w = getWindow()
+    if (w && !w.isDestroyed()) {
+      w.webContents.send(IPC_EVENTS.REMINDER_DUE, {
+        noteId: note.id,
+        repeat: note.reminder.repeat
+      })
+    }
+  }
+}

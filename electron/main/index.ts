@@ -4,10 +4,14 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createOverlayWindow } from '../window/createOverlayWindow'
 import { registerIpcHandlers } from './ipc-setup'
+import { loadNotesState } from './notes-persistence'
+import { setNotesForReminders, startReminderScheduler } from '../notifications/reminder-scheduler'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 let mainWindow: BrowserWindow | null = null
+
+const gotLock = app.requestSingleInstanceLock()
 
 function preloadPath(): string {
   const dir = join(__dirname, '../preload')
@@ -23,14 +27,28 @@ function createWindow(): void {
   })
 }
 
-app.whenReady().then(() => {
-  registerIpcHandlers(() => mainWindow)
-  createWindow()
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+if (!gotLock) {
+  app.quit()
+} else {
+  app.on('second-instance', () => {
+    const w = mainWindow
+    if (w && !w.isDestroyed()) {
+      if (w.isMinimized()) w.restore()
+      w.focus()
+    }
   })
-})
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit()
-})
+  app.whenReady().then(() => {
+    registerIpcHandlers(() => mainWindow)
+    void loadNotesState().then((state) => setNotesForReminders(state.notes))
+    startReminderScheduler(() => mainWindow)
+    createWindow()
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    })
+  })
+
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') app.quit()
+  })
+}
