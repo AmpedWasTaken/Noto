@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { IPC } from '@shared/ipc-channels'
+import { OverlayControls } from '@/components/OverlayControls'
 import { NoteCard } from '@/features/notes/NoteCard'
 import { useNotesPersistence } from '@/hooks/use-notes-persistence'
 import { useNoteStore } from '@/store/note-store'
@@ -20,7 +21,12 @@ export default function App() {
       {!showNotes ? (
         <div className="pointer-events-none p-6 text-sm text-noto-muted">Starting…</div>
       ) : (
-        notes.map((note) => <NoteCard key={note.id} note={note} />)
+        <>
+          <OverlayControls />
+          {notes.map((note) => (
+            <NoteCard key={note.id} note={note} />
+          ))}
+        </>
       )}
     </div>
   )
