@@ -6,10 +6,13 @@ import {
   type ChangeEvent,
   type PointerEvent as ReactPointerEvent
 } from 'react'
-import type { Note } from '@shared/note-types'
+import type { Note, NoteCategory } from '@shared/note-types'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
+import { HeadsetIcon } from '@/components/icons/HeadsetIcon'
 import { PencilIcon } from '@/components/icons/PencilIcon'
 import { NoteChecklist } from '@/features/notes/NoteChecklist'
+import { SupportCallForm } from '@/features/notes/SupportCallForm'
+import { emptySupportCall } from '@/features/notes/support-defaults'
 import { useNoteStore } from '@/store/note-store'
 
 type Props = {
@@ -24,6 +27,12 @@ type ResizeKind = 'se' | 's' | 'e'
 
 function clamp(n: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, n))
+}
+
+function categoryAccent(cat: NoteCategory): string {
+  return cat === 'support'
+    ? 'border-l-emerald-600/80'
+    : 'border-l-slate-500/70'
 }
 
 export function NoteCard({ note }: Props) {
@@ -59,6 +68,33 @@ export function NoteCard({ note }: Props) {
       updateNote(note.id, { content: e.target.value })
     },
     [note.id, updateNote]
+  )
+
+  const setCategory = useCallback(
+    (cat: NoteCategory) => {
+      if (cat === 'support') {
+        const sc = note.supportCall ?? {
+          ...emptySupportCall(),
+          issue: note.content.trim() || ''
+        }
+        updateNote(note.id, {
+          category: 'support',
+          supportCall: sc
+        })
+      } else {
+        const merged =
+          note.content.trim() ||
+          note.supportCall?.issue?.trim() ||
+          note.supportCall?.contactName?.trim() ||
+          ''
+        updateNote(note.id, {
+          category: 'note',
+          supportCall: null,
+          content: merged
+        })
+      }
+    },
+    [note.content, note.id, note.supportCall, updateNote]
   )
 
   const applySnap = useCallback(
@@ -155,9 +191,11 @@ export function NoteCard({ note }: Props) {
     setConfirmDelete(false)
   }, [note.id, removeNote])
 
+  const cat = note.category ?? 'note'
+
   return (
     <div
-      className="pointer-events-auto absolute flex flex-col overflow-hidden rounded-xl border border-white/10 border-l-[3px] border-l-slate-500/70 bg-[#1e222c] shadow-noto transition-shadow duration-200 ease-out hover:shadow-lg"
+      className={`pointer-events-auto absolute flex flex-col overflow-hidden rounded-xl border border-white/10 border-l-[3px] bg-[#1e222c] shadow-noto transition-shadow duration-200 ease-out hover:shadow-lg ${categoryAccent(cat)}`}
       style={{
         left: note.x,
         top: note.y,
@@ -169,8 +207,15 @@ export function NoteCard({ note }: Props) {
         className="flex shrink-0 cursor-grab select-none items-center gap-2 border-b border-white/10 bg-[#232730] px-2 py-2 active:cursor-grabbing"
         onPointerDown={onHeaderPointerDown}
       >
-        <span className="flex shrink-0 items-center justify-center text-noto-muted" title="Note">
-          <PencilIcon className="h-4 w-4" />
+        <span
+          className="flex shrink-0 items-center justify-center text-noto-muted"
+          title={cat === 'support' ? 'Support' : 'Notitie'}
+        >
+          {cat === 'support' ? (
+            <HeadsetIcon className="h-4 w-4 text-emerald-400/90" />
+          ) : (
+            <PencilIcon className="h-4 w-4" />
+          )}
         </span>
         <span className="min-w-0 flex-1" />
         <button
@@ -183,14 +228,47 @@ export function NoteCard({ note }: Props) {
           ×
         </button>
       </header>
-      <textarea
-        className="min-h-0 flex-1 resize-none bg-[#1a1d26] px-3 py-2 text-[13px] leading-relaxed text-noto-text placeholder:text-noto-muted/50 focus:outline-none"
-        placeholder="Type something…"
-        spellCheck
-        value={note.content}
-        onChange={onChange}
-      />
-      <NoteChecklist note={note} />
+
+      <div className="flex shrink-0 gap-1 border-b border-white/10 bg-[#1e222c] px-2 py-1.5">
+        <button
+          type="button"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={() => setCategory('note')}
+          className={`flex-1 rounded-md py-1 text-[11px] font-medium transition-colors ${
+            cat === 'note'
+              ? 'bg-white/12 text-noto-text'
+              : 'text-noto-muted hover:bg-white/[0.06]'
+          }`}
+        >
+          Notitie
+        </button>
+        <button
+          type="button"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={() => setCategory('support')}
+          className={`flex-1 rounded-md py-1 text-[11px] font-medium transition-colors ${
+            cat === 'support'
+              ? 'bg-emerald-500/20 text-emerald-100'
+              : 'text-noto-muted hover:bg-white/[0.06]'
+          }`}
+        >
+          Support
+        </button>
+      </div>
+
+      {cat === 'support' && note.supportCall ? (
+        <SupportCallForm note={note} />
+      ) : (
+        <textarea
+          className="min-h-0 flex-1 resize-none bg-[#1a1d26] px-3 py-2 text-[13px] leading-relaxed text-noto-text placeholder:text-noto-muted/50 focus:outline-none"
+          placeholder="Type something…"
+          spellCheck
+          value={note.content}
+          onChange={onChange}
+        />
+      )}
+
+      {cat === 'note' ? <NoteChecklist note={note} /> : null}
 
       <button
         type="button"
@@ -218,10 +296,14 @@ export function NoteCard({ note }: Props) {
 
       <ConfirmDialog
         open={confirmDelete}
-        title="Remove note?"
-        message="This note will be deleted. You can’t undo this."
-        confirmLabel="Remove"
-        cancelLabel="Cancel"
+        title={cat === 'support' ? 'Support verwijderen?' : 'Notitie verwijderen?'}
+        message={
+          cat === 'support'
+            ? 'Dit supportgesprek wordt gewist. Dit kun je niet ongedaan maken.'
+            : 'Deze notitie wordt gewist. Dit kun je niet ongedaan maken.'
+        }
+        confirmLabel="Verwijderen"
+        cancelLabel="Annuleren"
         danger
         onConfirm={handleDelete}
         onCancel={() => setConfirmDelete(false)}

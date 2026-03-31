@@ -1,4 +1,5 @@
-import type { Note, NoteTask } from '@shared/note-types'
+import type { Note, NoteTask, NoteCategory, SupportCallData } from '@shared/note-types'
+import { emptySupportCall } from '@/features/notes/support-defaults'
 
 function asTasks(raw: unknown): NoteTask[] {
   if (!Array.isArray(raw)) return []
@@ -13,11 +14,39 @@ function asTasks(raw: unknown): NoteTask[] {
     .filter((x): x is NoteTask => x !== null)
 }
 
+function asCategory(raw: unknown): NoteCategory {
+  return raw === 'support' ? 'support' : 'note'
+}
+
+function asSupportCall(raw: unknown): SupportCallData | null {
+  if (!raw || typeof raw !== 'object') return null
+  const o = raw as Record<string, unknown>
+  const base = emptySupportCall()
+  return {
+    contactName: typeof o.contactName === 'string' ? o.contactName : base.contactName,
+    companyName: typeof o.companyName === 'string' ? o.companyName : base.companyName,
+    website: typeof o.website === 'string' ? o.website : base.website,
+    phone: typeof o.phone === 'string' ? o.phone : base.phone,
+    issue: typeof o.issue === 'string' ? o.issue : base.issue
+  }
+}
+
 /** Ensures persisted notes from older saves include new fields. */
 export function normalizeNote(n: Note): Note {
+  const loose = n as Note & { category?: unknown; supportCall?: unknown }
+  const category = asCategory(loose.category)
+  let supportCall: SupportCallData | null = asSupportCall(loose.supportCall)
+  if (category === 'support' && !supportCall) {
+    supportCall = emptySupportCall()
+  }
+  if (category === 'note') {
+    supportCall = null
+  }
   return {
     ...n,
-    tasks: asTasks((n as { tasks?: unknown }).tasks)
+    tasks: asTasks((n as { tasks?: unknown }).tasks),
+    category,
+    supportCall
   }
 }
 

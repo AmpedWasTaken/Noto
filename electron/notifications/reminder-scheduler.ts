@@ -29,7 +29,11 @@ function tick(getWindow: () => BrowserWindow | null): void {
     cooling.add(note.id)
     setTimeout(() => cooling.delete(note.id), 5000)
 
-    const body = note.content.trim().slice(0, 140) || 'Reminder'
+    const preview =
+      note.supportCall?.issue?.trim() ||
+      note.supportCall?.contactName?.trim() ||
+      note.content.trim()
+    const body = preview.slice(0, 140) || 'Reminder'
     if (Notification.isSupported()) {
       const n = new Notification({ title: 'Noto', body })
       n.show()

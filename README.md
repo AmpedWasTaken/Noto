@@ -32,6 +32,8 @@ Press **Ctrl+Shift+H** to hide or show the Noto window, or use the **Hide** cont
 
 Drag a note by its header. Resize using the **bottom edge** (height), **right edge** (width), or the **bottom-right corner** (both). Close a note with **×** — you’ll be asked to confirm before it’s removed.
 
+Each card can be a simple **note** or a **support** entry: name, optional company, website, phone, and a short description (“wat er aan de hand is”). Use **Notitie** / **Support** on the card to switch, or **+ Support** in the top bar for a new support card.
+
 ### Data
 
 Notes are stored locally as JSON under the app user data directory (`noto-data.json`).

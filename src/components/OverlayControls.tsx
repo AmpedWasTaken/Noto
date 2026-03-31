@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { IPC } from '@shared/ipc-channels'
+import { useNoteStore } from '@/store/note-store'
 
 export function OverlayControls() {
+  const addSupportNote = useNoteStore((s) => s.addSupportNote)
   const [pinned, setPinned] = useState(true)
 
   useEffect(() => {
@@ -21,8 +23,16 @@ export function OverlayControls() {
   }, [])
 
   return (
-    <div className="pointer-events-auto fixed right-4 top-4 z-[1000] flex items-center gap-2 rounded-lg border border-white/10 bg-[#1e222c] px-2 py-1.5 text-[11px] shadow-noto">
+    <div className="pointer-events-auto fixed right-4 top-4 z-[1000] flex max-w-[min(100vw-2rem,22rem)] flex-wrap items-center gap-2 rounded-lg border border-white/10 bg-[#1e222c] px-2 py-1.5 text-[11px] shadow-noto">
       <span className="select-none text-noto-muted">Noto</span>
+      <button
+        type="button"
+        onClick={() => addSupportNote()}
+        className="rounded-md bg-emerald-500/15 px-2 py-0.5 font-medium text-emerald-200/95 hover:bg-emerald-500/25"
+        title="Nieuw supportgesprek"
+      >
+        + Support
+      </button>
       <button
         type="button"
         onClick={toggle}
