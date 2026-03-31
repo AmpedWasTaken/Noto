@@ -8,6 +8,13 @@
   --noto-muted: #9aa0a6;
 }
 
+html,
+body,
+#root {
+  min-height: 100%;
+  background: transparent;
+}
+
 body {
   margin: 0;
   font-family:

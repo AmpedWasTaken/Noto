@@ -2,8 +2,12 @@ import { app, BrowserWindow } from 'electron'
 import { existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { createOverlayWindow } from '../window/createOverlayWindow'
+import { registerIpcHandlers } from './ipc-setup'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
+
+let mainWindow: BrowserWindow | null = null
 
 function preloadPath(): string {
   const dir = join(__dirname, '../preload')
@@ -13,26 +17,14 @@ function preloadPath(): string {
 }
 
 function createWindow(): void {
-  const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 700,
-    title: 'Noto',
-    webPreferences: {
-      preload: preloadPath(),
-      contextIsolation: true,
-      nodeIntegration: false,
-      sandbox: false
-    }
+  mainWindow = createOverlayWindow(preloadPath)
+  mainWindow.on('closed', () => {
+    mainWindow = null
   })
-
-  if (process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
-  } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
-  }
 }
 
 app.whenReady().then(() => {
+  registerIpcHandlers(() => mainWindow)
   createWindow()
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
