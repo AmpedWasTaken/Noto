@@ -31,5 +31,12 @@ export function useNotesPersistence(): boolean {
     })
   }, [hydrated])
 
+  useEffect(() => {
+    if (!hydrated) return
+    return window.noto.onFlushSave(() => {
+      void window.noto.invoke(IPC.SAVE_NOTES, useNoteStore.getState().notes)
+    })
+  }, [hydrated])
+
   return hydrated
 }

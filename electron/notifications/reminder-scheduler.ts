@@ -1,6 +1,7 @@
 import { Notification, type BrowserWindow } from 'electron'
 import type { Note } from '@shared/note-types'
 import { IPC_EVENTS } from '@shared/ipc-channels'
+import { loadNotesState } from '../main/notes-persistence'
 
 let notesRef: Note[] = []
 const cooling = new Set<string>()
@@ -14,12 +15,19 @@ let timer: ReturnType<typeof setInterval> | null = null
 export function startReminderScheduler(getWindow: () => BrowserWindow | null): void {
   if (timer) return
   timer = setInterval(() => {
-    tick(getWindow)
+    void tick(getWindow)
   }, 45_000)
-  tick(getWindow)
+  void tick(getWindow)
 }
 
-function tick(getWindow: () => BrowserWindow | null): void {
+async function tick(getWindow: () => BrowserWindow | null): Promise<void> {
+  try {
+    const state = await loadNotesState()
+    notesRef = state.notes
+  } catch {
+    /* blijf laatste notesRef gebruiken */
+  }
+
   const now = Date.now()
   for (const note of notesRef) {
     if (!note.reminder) continue
@@ -35,7 +43,11 @@ function tick(getWindow: () => BrowserWindow | null): void {
       note.content.trim()
     const body = preview.slice(0, 140) || 'Reminder'
     if (Notification.isSupported()) {
-      const n = new Notification({ title: 'Noto', body })
+      const n = new Notification({
+        title: 'Noto',
+        body,
+        silent: false
+      })
       n.show()
     }
 

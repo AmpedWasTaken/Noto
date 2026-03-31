@@ -7,6 +7,7 @@ import { registerIpcHandlers } from './ipc-setup'
 import { loadNotesState } from './notes-persistence'
 import { setNotesForReminders, startReminderScheduler } from '../notifications/reminder-scheduler'
 import { registerGlobalShortcuts } from '../shortcuts/register-global-shortcuts'
+import { IPC_EVENTS } from '@shared/ipc-channels'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -25,6 +26,12 @@ function createWindow(): void {
   mainWindow = createOverlayWindow(preloadPath)
   mainWindow.on('closed', () => {
     mainWindow = null
+  })
+  mainWindow.on('hide', () => {
+    const w = mainWindow
+    if (w && !w.isDestroyed()) {
+      w.webContents.send(IPC_EVENTS.FLUSH_SAVE)
+    }
   })
 }
 

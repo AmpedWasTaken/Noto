@@ -17,5 +17,7 @@ export type IpcChannel = (typeof IPC)[keyof typeof IPC]
 /** Main → renderer one-way events (use preload subscriptions). */
 export const IPC_EVENTS = {
   QUICK_ADD: 'noto:quick-add',
-  REMINDER_DUE: 'noto:reminder-due'
+  REMINDER_DUE: 'noto:reminder-due',
+  /** Main → renderer: direct opslaan (o.a. als overlay verborgen wordt). */
+  FLUSH_SAVE: 'noto:flush-save'
 } as const

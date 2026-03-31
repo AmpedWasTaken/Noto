@@ -21,5 +21,12 @@ contextBridge.exposeInMainWorld('noto', {
     return () => {
       ipcRenderer.removeListener(IPC_EVENTS.REMINDER_DUE, listener)
     }
+  },
+  onFlushSave: (cb: () => void) => {
+    const listener = () => cb()
+    ipcRenderer.on(IPC_EVENTS.FLUSH_SAVE, listener)
+    return () => {
+      ipcRenderer.removeListener(IPC_EVENTS.FLUSH_SAVE, listener)
+    }
   }
 })

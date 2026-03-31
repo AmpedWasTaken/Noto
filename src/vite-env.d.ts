@@ -11,6 +11,7 @@ declare global {
       onReminderDue: (
         cb: (payload: { noteId: string; repeat: 'none' | 'daily' }) => void
       ) => () => void
+      onFlushSave: (cb: () => void) => () => void
     }
   }
 }

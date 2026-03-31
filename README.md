@@ -26,7 +26,7 @@ While Noto is running, press **Ctrl+Shift+N** (Windows/Linux) to create a new no
 
 ### Hide overlay
 
-Press **Ctrl+Shift+H** to hide or show the Noto window, or use the **Hide** control in the top-right bar. When hidden, use **Ctrl+Shift+H** again to bring Noto back.
+Press **Ctrl+Shift+H** to hide or show the Noto window, or use the **Hide** control in the top-right bar. When hidden, use **Ctrl+Shift+H** again to bring Noto back. Reminders are still checked in the background; your notes are flushed to disk when you hide so notifications keep working.
 
 ### Notes UI
 
