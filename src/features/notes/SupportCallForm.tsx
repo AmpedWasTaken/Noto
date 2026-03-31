@@ -28,60 +28,62 @@ export function SupportCallForm({ note }: Props) {
     }
 
   return (
-    <div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto bg-[#1a1d26] px-3 py-2.5">
-      <div>
-        <label className="mb-1 block text-[11px] font-medium text-noto-muted">Naam</label>
-        <input
-          className={field}
-          type="text"
-          autoComplete="name"
-          placeholder="Contactpersoon"
-          value={data.contactName}
-          onChange={on('contactName')}
-        />
+    <div className="flex min-h-0 flex-1 flex-col bg-[#1a1d26] px-3 py-2.5">
+      <div className="shrink-0 space-y-2.5">
+        <div>
+          <label className="mb-1 block text-[11px] font-medium text-noto-muted">Naam</label>
+          <input
+            className={field}
+            type="text"
+            autoComplete="name"
+            placeholder="Contactpersoon"
+            value={data.contactName}
+            onChange={on('contactName')}
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-[11px] font-medium text-noto-muted">
+            Bedrijfsnaam <span className="font-normal text-noto-muted/70">(optioneel)</span>
+          </label>
+          <input
+            className={field}
+            type="text"
+            autoComplete="organization"
+            placeholder="Bedrijf"
+            value={data.companyName}
+            onChange={on('companyName')}
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-[11px] font-medium text-noto-muted">Website</label>
+          <input
+            className={field}
+            type="url"
+            inputMode="url"
+            placeholder="https://…"
+            value={data.website}
+            onChange={on('website')}
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-[11px] font-medium text-noto-muted">Nummer</label>
+          <input
+            className={field}
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            placeholder="Telefoonnummer"
+            value={data.phone}
+            onChange={on('phone')}
+          />
+        </div>
       </div>
-      <div>
-        <label className="mb-1 block text-[11px] font-medium text-noto-muted">
-          Bedrijfsnaam <span className="font-normal text-noto-muted/70">(optioneel)</span>
-        </label>
-        <input
-          className={field}
-          type="text"
-          autoComplete="organization"
-          placeholder="Bedrijf"
-          value={data.companyName}
-          onChange={on('companyName')}
-        />
-      </div>
-      <div>
-        <label className="mb-1 block text-[11px] font-medium text-noto-muted">Website</label>
-        <input
-          className={field}
-          type="url"
-          inputMode="url"
-          placeholder="https://…"
-          value={data.website}
-          onChange={on('website')}
-        />
-      </div>
-      <div>
-        <label className="mb-1 block text-[11px] font-medium text-noto-muted">Nummer</label>
-        <input
-          className={field}
-          type="tel"
-          inputMode="tel"
-          autoComplete="tel"
-          placeholder="Telefoonnummer"
-          value={data.phone}
-          onChange={on('phone')}
-        />
-      </div>
-      <div className="flex min-h-[72px] flex-1 flex-col">
-        <label className="mb-1 block text-[11px] font-medium text-noto-muted">
+      <div className="mt-2 flex min-h-0 flex-1 flex-col">
+        <label className="mb-1 shrink-0 text-[11px] font-medium text-noto-muted">
           Wat is er aan de hand?
         </label>
         <textarea
-          className={`${field} min-h-[88px] flex-1 resize-none leading-relaxed`}
+          className={`${field} min-h-0 flex-1 resize-none py-2 leading-relaxed`}
           placeholder="Korte omschrijving van het gesprek of het probleem…"
           spellCheck
           value={data.issue}

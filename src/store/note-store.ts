@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import type { Note } from '@shared/note-types'
 import { emptySupportCall } from '@/features/notes/support-defaults'
+import { fullViewportBounds } from '@/utils/viewport'
 
 function createId(): string {
   return `note-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`
@@ -25,12 +26,15 @@ export function createDefaultNote(): Note {
 }
 
 export function createSupportNote(): Note {
+  const v = fullViewportBounds()
   return {
     ...createDefaultNote(),
     category: 'support',
     supportCall: emptySupportCall(),
-    width: 360,
-    height: 400
+    x: v.x,
+    y: v.y,
+    width: v.width,
+    height: v.height
   }
 }
 

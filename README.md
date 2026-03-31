@@ -32,7 +32,9 @@ Press **Ctrl+Shift+H** to hide or show the Noto window, or use the **Hide** cont
 
 Drag a note by its header. Resize using the **bottom edge** (height), **right edge** (width), or the **bottom-right corner** (both). Close a note with **×** — you’ll be asked to confirm before it’s removed.
 
-Each card can be a simple **note** or a **support** entry: name, optional company, website, phone, and a short description (“wat er aan de hand is”). Use **Notitie** / **Support** on the card to switch, or **+ Support** in the top bar for a new support card.
+Each card can be a simple **note** or a **support** entry: name, optional company, website, phone, and a short description (“wat er aan de hand is”). Use **Notitie** / **Support** on the card to switch, or **+ Support** in the top bar for a new support card. Support cards fill the overlay (no inner scroll); regular notes can be dragged and resized.
+
+On **Notitie** cards you can set a **herinnering** (date/time, once or daily), with snooze options — native notifications fire when due.
 
 ### Data
 
