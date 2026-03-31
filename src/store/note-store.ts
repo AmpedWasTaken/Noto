@@ -9,10 +9,11 @@ export function createDefaultNote(): Note {
   return {
     id: createId(),
     content: '',
+    tasks: [],
     x: 48,
     y: 48,
     width: 320,
-    height: 280,
+    height: 320,
     type: 'work',
     pinLevel: 'alwaysOnTop',
     miniMode: false,

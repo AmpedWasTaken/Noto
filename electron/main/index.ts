@@ -6,7 +6,7 @@ import { createOverlayWindow } from '../window/createOverlayWindow'
 import { registerIpcHandlers } from './ipc-setup'
 import { loadNotesState } from './notes-persistence'
 import { setNotesForReminders, startReminderScheduler } from '../notifications/reminder-scheduler'
-import { registerQuickAddShortcut } from '../shortcuts/register-quick-add'
+import { registerGlobalShortcuts } from '../shortcuts/register-global-shortcuts'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -35,6 +35,7 @@ if (!gotLock) {
     const w = mainWindow
     if (w && !w.isDestroyed()) {
       if (w.isMinimized()) w.restore()
+      w.show()
       w.focus()
     }
   })
@@ -46,7 +47,7 @@ if (!gotLock) {
     registerIpcHandlers(() => mainWindow)
     void loadNotesState().then((state) => setNotesForReminders(state.notes))
     startReminderScheduler(() => mainWindow)
-    registerQuickAddShortcut(() => mainWindow)
+    registerGlobalShortcuts(() => mainWindow)
     createWindow()
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) createWindow()

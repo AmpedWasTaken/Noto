@@ -8,9 +8,17 @@ export interface NoteReminder {
   snoozedUntil?: string
 }
 
+export interface NoteTask {
+  id: string
+  text: string
+  done: boolean
+}
+
 export interface Note {
   id: string
   content: string
+  /** Simple checklist rows (persisted with the note). */
+  tasks: NoteTask[]
   x: number
   y: number
   width: number

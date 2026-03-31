@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, type ChangeEvent, type PointerEvent as ReactPointerEvent } from 'react'
 import type { Note, NoteType } from '@shared/note-types'
 import { useNoteStore } from '@/store/note-store'
+import { NoteChecklist } from '@/features/notes/NoteChecklist'
 import { ReminderBar } from '@/features/reminders/ReminderBar'
 import { noteAccentClass } from './note-theme'
 
@@ -129,7 +130,7 @@ export function NoteCard({ note }: Props) {
 
   return (
     <div
-      className={`pointer-events-auto absolute flex flex-col overflow-hidden rounded-xl border border-white/[0.08] bg-noto-surface/90 shadow-noto backdrop-blur-md transition-shadow duration-200 ease-out hover:shadow-lg ${noteAccentClass(note.type)} border-l-[3px]`}
+      className={`pointer-events-auto absolute flex flex-col overflow-hidden rounded-xl border border-white/10 bg-[#1e222c] shadow-noto transition-shadow duration-200 ease-out hover:shadow-lg ${noteAccentClass(note.type)} border-l-[3px]`}
       style={{
         left: note.x,
         top: note.y,
@@ -138,7 +139,7 @@ export function NoteCard({ note }: Props) {
       }}
     >
       <header
-        className="flex shrink-0 cursor-grab select-none items-center justify-between border-b border-white/[0.06] px-3 py-2 active:cursor-grabbing"
+        className="flex shrink-0 cursor-grab select-none items-center justify-between border-b border-white/10 bg-[#232730] px-3 py-2 active:cursor-grabbing"
         onPointerDown={onHeaderPointerDown}
       >
         <span className="text-[11px] font-medium uppercase tracking-wider text-noto-muted">
@@ -156,12 +157,13 @@ export function NoteCard({ note }: Props) {
         </select>
       </header>
       <textarea
-        className="min-h-0 flex-1 resize-none bg-transparent px-3 py-2 text-[13px] leading-relaxed text-noto-text placeholder:text-noto-muted/50 focus:outline-none"
+        className="min-h-0 flex-1 resize-none bg-[#1a1d26] px-3 py-2 text-[13px] leading-relaxed text-noto-text placeholder:text-noto-muted/50 focus:outline-none"
         placeholder="Type something…"
         spellCheck
         value={note.content}
         onChange={onChange}
       />
+      <NoteChecklist note={note} />
       <ReminderBar note={note} />
       <button
         type="button"

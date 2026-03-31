@@ -24,6 +24,10 @@ Runs the Electron app with Vite hot reload for the renderer.
 
 While Noto is running, press **Ctrl+Shift+N** (Windows/Linux) to create a new note instantly.
 
+### Hide overlay
+
+Press **Ctrl+Shift+H** to hide or show the Noto window, or use the **Hide** control in the top-right bar. When hidden, use **Ctrl+Shift+H** again to bring Noto back.
+
 ### Data
 
 Notes are stored locally as JSON under the app user data directory (`noto-data.json`).

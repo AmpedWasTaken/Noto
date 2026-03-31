@@ -16,8 +16,12 @@ export function OverlayControls() {
     void window.noto.invoke(IPC.SET_ALWAYS_ON_TOP, next)
   }, [pinned])
 
+  const hideOverlay = useCallback(() => {
+    void window.noto.invoke(IPC.SET_OVERLAY_VISIBLE, false)
+  }, [])
+
   return (
-    <div className="pointer-events-auto fixed right-4 top-4 z-[1000] flex items-center gap-2 rounded-lg border border-white/[0.1] bg-noto-surface/95 px-2 py-1.5 text-[11px] shadow-noto backdrop-blur-md">
+    <div className="pointer-events-auto fixed right-4 top-4 z-[1000] flex items-center gap-2 rounded-lg border border-white/10 bg-[#1e222c] px-2 py-1.5 text-[11px] shadow-noto">
       <span className="select-none text-noto-muted">Noto</span>
       <button
         type="button"
@@ -30,6 +34,14 @@ export function OverlayControls() {
         title={pinned ? 'Always on top (click to disable)' : 'Click to keep on top'}
       >
         {pinned ? 'On top' : 'Normal'}
+      </button>
+      <button
+        type="button"
+        onClick={hideOverlay}
+        className="rounded-md bg-white/[0.06] px-2 py-0.5 font-medium text-noto-muted hover:bg-white/[0.1]"
+        title="Hide overlay (press Ctrl+Shift+H to show again)"
+      >
+        Hide
       </button>
     </div>
   )

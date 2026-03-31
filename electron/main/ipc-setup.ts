@@ -31,4 +31,18 @@ export function registerIpcHandlers(getWindow: () => BrowserWindow | null): void
     const win = getWindow()
     return win ? win.isAlwaysOnTop() : false
   })
+
+  ipcMain.handle(IPC.SET_OVERLAY_VISIBLE, (_e, visible: boolean) => {
+    const win = getWindow()
+    if (win && !win.isDestroyed()) {
+      if (visible) {
+        win.show()
+        win.focus()
+      } else {
+        win.hide()
+      }
+      return { visible: win.isVisible() }
+    }
+    return { visible: false }
+  })
 }

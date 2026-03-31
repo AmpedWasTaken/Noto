@@ -3,6 +3,7 @@ export const IPC = {
   READY: 'noto:ready',
   SET_ALWAYS_ON_TOP: 'noto:set-always-on-top',
   GET_ALWAYS_ON_TOP: 'noto:get-always-on-top',
+  SET_OVERLAY_VISIBLE: 'noto:set-overlay-visible',
   LOAD_NOTES: 'noto:load-notes',
   SAVE_NOTES: 'noto:save-notes',
   CREATE_NOTE: 'noto:create-note',

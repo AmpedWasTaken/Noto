@@ -4,6 +4,7 @@ import type { PersistedNotesState } from '@shared/note-schema'
 import type { Note } from '@shared/note-types'
 import { createDefaultNote, useNoteStore } from '@/store/note-store'
 import { debounce } from '@/utils/debounce'
+import { normalizeNotes } from '@/utils/normalize-notes'
 
 const saveToDisk = debounce((notes: Note[]) => {
   void window.noto.invoke(IPC.SAVE_NOTES, notes)
@@ -17,7 +18,7 @@ export function useNotesPersistence(): boolean {
   useEffect(() => {
     void window.noto.invoke(IPC.LOAD_NOTES).then((raw) => {
       const data = raw as PersistedNotesState
-      const list = data?.notes?.length ? data.notes : [createDefaultNote()]
+      const list = data?.notes?.length ? normalizeNotes(data.notes) : [createDefaultNote()]
       replaceNotes(list)
       setHydrated(true)
     })
