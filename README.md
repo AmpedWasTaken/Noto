@@ -28,6 +28,10 @@ While Noto is running, press **Ctrl+Shift+N** (Windows/Linux) to create a new no
 
 Press **Ctrl+Shift+H** to hide or show the Noto window, or use the **Hide** control in the top-right bar. When hidden, use **Ctrl+Shift+H** again to bring Noto back.
 
+### Notes UI
+
+Drag a note by its header. Resize using the **bottom edge** (height), **right edge** (width), or the **bottom-right corner** (both). Remove a note with **×** in the header.
+
 ### Data
 
 Notes are stored locally as JSON under the app user data directory (`noto-data.json`).

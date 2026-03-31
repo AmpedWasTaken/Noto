@@ -51,9 +51,17 @@ export default function App() {
       ) : (
         <>
           <OverlayControls />
-          {notes.map((note) => (
-            <NoteCard key={note.id} note={note} />
-          ))}
+          {notes.length === 0 ? (
+            <div className="pointer-events-none fixed left-1/2 top-24 z-[500] -translate-x-1/2 rounded-lg border border-white/10 bg-[#1e222c] px-4 py-3 text-center text-sm text-noto-muted shadow-noto">
+              No notes — press{' '}
+              <kbd className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[11px] text-noto-text">
+                Ctrl+Shift+N
+              </kbd>{' '}
+              to add one
+            </div>
+          ) : (
+            notes.map((note) => <NoteCard key={note.id} note={note} />)
+          )}
         </>
       )}
     </div>

@@ -26,6 +26,7 @@ type NoteStore = {
   replaceNotes: (notes: Note[]) => void
   addNote: () => void
   updateNote: (id: string, patch: Partial<Note>) => void
+  removeNote: (id: string) => void
 }
 
 export const useNoteStore = create<NoteStore>((set) => ({
@@ -38,5 +39,9 @@ export const useNoteStore = create<NoteStore>((set) => ({
   updateNote: (id, patch) =>
     set((s) => ({
       notes: s.notes.map((n) => (n.id === id ? { ...n, ...patch } : n))
+    })),
+  removeNote: (id) =>
+    set((s) => ({
+      notes: s.notes.filter((n) => n.id !== id)
     }))
 }))
