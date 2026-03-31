@@ -129,7 +129,7 @@ export function NoteCard({ note }: Props) {
 
   return (
     <div
-      className={`pointer-events-auto absolute flex flex-col overflow-hidden rounded-xl border border-white/[0.08] bg-noto-surface/90 shadow-noto backdrop-blur-md ${noteAccentClass(note.type)} border-l-[3px]`}
+      className={`pointer-events-auto absolute flex flex-col overflow-hidden rounded-xl border border-white/[0.08] bg-noto-surface/90 shadow-noto backdrop-blur-md transition-shadow duration-200 ease-out hover:shadow-lg ${noteAccentClass(note.type)} border-l-[3px]`}
       style={{
         left: note.x,
         top: note.y,

@@ -40,6 +40,9 @@ if (!gotLock) {
   })
 
   app.whenReady().then(() => {
+    if (process.platform === 'win32') {
+      app.setAppUserModelId('com.noto.app')
+    }
     registerIpcHandlers(() => mainWindow)
     void loadNotesState().then((state) => setNotesForReminders(state.notes))
     startReminderScheduler(() => mainWindow)

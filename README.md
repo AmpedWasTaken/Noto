@@ -20,6 +20,14 @@ npm run dev
 
 Runs the Electron app with Vite hot reload for the renderer.
 
+### Quick add
+
+While Noto is running, press **Ctrl+Shift+N** (Windows/Linux) to create a new note instantly.
+
+### Data
+
+Notes are stored locally as JSON under the app user data directory (`noto-data.json`).
+
 ## Build
 
 ```bash
