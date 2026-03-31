@@ -12,7 +12,7 @@ export function createDefaultNote(): Note {
     x: 48,
     y: 48,
     width: 320,
-    height: 220,
+    height: 280,
     type: 'work',
     pinLevel: 'alwaysOnTop',
     miniMode: false,
