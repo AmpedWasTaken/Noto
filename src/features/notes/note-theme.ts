@@ -1,4 +1,4 @@
-import type { NoteType } from '@/store/note-types'
+import type { NoteType } from '@shared/note-types'
 
 const accents: Record<NoteType, string> = {
   work: 'border-l-emerald-400/80',

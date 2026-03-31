@@ -1,0 +1,34 @@
+import { useEffect, useState } from 'react'
+import { IPC } from '@shared/ipc-channels'
+import type { PersistedNotesState } from '@shared/note-schema'
+import type { Note } from '@shared/note-types'
+import { createDefaultNote, useNoteStore } from '@/store/note-store'
+import { debounce } from '@/utils/debounce'
+
+const saveToDisk = debounce((notes: Note[]) => {
+  void window.noto.invoke(IPC.SAVE_NOTES, notes)
+}, 300)
+
+/** Load notes on mount; debounced save when the store changes after hydration. */
+export function useNotesPersistence(): boolean {
+  const [hydrated, setHydrated] = useState(false)
+  const replaceNotes = useNoteStore((s) => s.replaceNotes)
+
+  useEffect(() => {
+    void window.noto.invoke(IPC.LOAD_NOTES).then((raw) => {
+      const data = raw as PersistedNotesState
+      const list = data?.notes?.length ? data.notes : [createDefaultNote()]
+      replaceNotes(list)
+      setHydrated(true)
+    })
+  }, [replaceNotes])
+
+  useEffect(() => {
+    if (!hydrated) return
+    return useNoteStore.subscribe((state) => {
+      saveToDisk(state.notes)
+    })
+  }, [hydrated])
+
+  return hydrated
+}

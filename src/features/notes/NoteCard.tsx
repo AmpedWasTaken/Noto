@@ -1,5 +1,5 @@
 import { useCallback, type ChangeEvent } from 'react'
-import type { Note } from '@/store/note-types'
+import type { Note } from '@shared/note-types'
 import { useNoteStore } from '@/store/note-store'
 import { noteAccentClass } from './note-theme'
 
