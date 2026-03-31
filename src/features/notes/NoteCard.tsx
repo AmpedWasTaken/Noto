@@ -13,9 +13,11 @@ import { PencilIcon } from '@/components/icons/PencilIcon'
 import { ReminderSection } from '@/features/reminders/ReminderSection'
 import { NoteChecklist } from '@/features/notes/NoteChecklist'
 import { SupportCallForm } from '@/features/notes/SupportCallForm'
-import { emptySupportCall } from '@/features/notes/support-defaults'
+import {
+  emptySupportCall,
+  SUPPORT_CARD
+} from '@/features/notes/support-defaults'
 import { useNoteStore } from '@/store/note-store'
-import { fullViewportBounds } from '@/utils/viewport'
 
 type Props = {
   note: Note
@@ -79,10 +81,15 @@ export function NoteCard({ note }: Props) {
           ...emptySupportCall(),
           issue: note.content.trim() || ''
         }
+        const maxX = Math.max(0, window.innerWidth - SUPPORT_CARD.width)
+        const maxY = Math.max(0, window.innerHeight - SUPPORT_CARD.height)
         updateNote(note.id, {
           category: 'support',
           supportCall: sc,
-          ...fullViewportBounds()
+          width: SUPPORT_CARD.width,
+          height: SUPPORT_CARD.height,
+          x: Math.min(Math.max(note.x, 0), maxX),
+          y: Math.min(Math.max(note.y, 0), maxY)
         })
       } else {
         const merged =
@@ -170,11 +177,9 @@ export function NoteCard({ note }: Props) {
   }, [note.id, applySnap, updateNote])
 
   const cat = note.category ?? 'note'
-  const isSupport = cat === 'support'
 
   const onHeaderPointerDown = (e: ReactPointerEvent) => {
     if (e.button !== 0) return
-    if (isSupport) return
     e.preventDefault()
     dragRef.current = {
       startX: e.clientX,
@@ -202,19 +207,9 @@ export function NoteCard({ note }: Props) {
     setConfirmDelete(false)
   }, [note.id, removeNote])
 
-  useEffect(() => {
-    if (!isSupport) return
-    const fit = () => {
-      updateNote(note.id, fullViewportBounds())
-    }
-    fit()
-    window.addEventListener('resize', fit)
-    return () => window.removeEventListener('resize', fit)
-  }, [isSupport, note.id, updateNote])
-
   return (
     <div
-      className={`pointer-events-auto absolute flex flex-col overflow-hidden border border-white/10 border-l-[3px] bg-[#1e222c] shadow-noto transition-shadow duration-200 ease-out hover:shadow-lg ${isSupport ? 'rounded-none' : 'rounded-xl'} ${categoryAccent(cat)}`}
+      className={`pointer-events-auto absolute flex flex-col overflow-hidden rounded-xl border border-white/10 border-l-[3px] bg-[#1e222c] shadow-noto transition-shadow duration-200 ease-out hover:shadow-lg ${categoryAccent(cat)}`}
       style={{
         left: note.x,
         top: note.y,
@@ -223,7 +218,7 @@ export function NoteCard({ note }: Props) {
       }}
     >
       <header
-        className={`flex shrink-0 select-none items-center gap-2 border-b border-white/10 bg-[#232730] px-2 py-2 ${isSupport ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
+        className="flex shrink-0 cursor-grab select-none items-center gap-2 border-b border-white/10 bg-[#232730] px-2 py-2 active:cursor-grabbing"
         onPointerDown={onHeaderPointerDown}
       >
         <span
@@ -290,33 +285,29 @@ export function NoteCard({ note }: Props) {
       {cat === 'note' ? <NoteChecklist note={note} /> : null}
       {cat === 'note' ? <ReminderSection note={note} /> : null}
 
-      {!isSupport ? (
-        <>
-          <button
-            type="button"
-            aria-label="Resize height"
-            className="absolute bottom-0 left-0 right-6 h-2 cursor-ns-resize touch-none bg-transparent"
-            onPointerDown={startResize('s')}
-          />
-          <button
-            type="button"
-            aria-label="Resize width"
-            className="absolute right-0 top-0 bottom-6 w-2 cursor-ew-resize touch-none bg-transparent"
-            onPointerDown={startResize('e')}
-          />
-          <button
-            type="button"
-            aria-label="Resize note"
-            className="absolute bottom-0 right-0 flex h-6 w-6 cursor-nwse-resize touch-none items-end justify-end p-0.5"
-            onPointerDown={startResize('se')}
-          >
-            <span
-              className="pointer-events-none block h-3 w-3 rounded-br-md border-b-2 border-r-2 border-white/25"
-              aria-hidden
-            />
-          </button>
-        </>
-      ) : null}
+      <button
+        type="button"
+        aria-label="Resize height"
+        className="absolute bottom-0 left-0 right-6 h-2 cursor-ns-resize touch-none bg-transparent"
+        onPointerDown={startResize('s')}
+      />
+      <button
+        type="button"
+        aria-label="Resize width"
+        className="absolute right-0 top-0 bottom-6 w-2 cursor-ew-resize touch-none bg-transparent"
+        onPointerDown={startResize('e')}
+      />
+      <button
+        type="button"
+        aria-label="Resize note"
+        className="absolute bottom-0 right-0 flex h-6 w-6 cursor-nwse-resize touch-none items-end justify-end p-0.5"
+        onPointerDown={startResize('se')}
+      >
+        <span
+          className="pointer-events-none block h-3 w-3 rounded-br-md border-b-2 border-r-2 border-white/25"
+          aria-hidden
+        />
+      </button>
 
       <ConfirmDialog
         open={confirmDelete}

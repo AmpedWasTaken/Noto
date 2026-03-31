@@ -28,8 +28,8 @@ export function SupportCallForm({ note }: Props) {
     }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-[#1a1d26] px-3 py-2.5">
-      <div className="shrink-0 space-y-2.5">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#1a1d26] px-3 py-2">
+      <div className="shrink-0 space-y-2">
         <div>
           <label className="mb-1 block text-[11px] font-medium text-noto-muted">Naam</label>
           <input
