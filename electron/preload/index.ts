@@ -4,6 +4,13 @@ import { IPC, IPC_EVENTS } from '@shared/ipc-channels'
 contextBridge.exposeInMainWorld('noto', {
   ipc: IPC,
   invoke: (channel: string, ...args: unknown[]) => ipcRenderer.invoke(channel, ...args),
+  onQuickAdd: (cb: () => void) => {
+    const listener = () => cb()
+    ipcRenderer.on(IPC_EVENTS.QUICK_ADD, listener)
+    return () => {
+      ipcRenderer.removeListener(IPC_EVENTS.QUICK_ADD, listener)
+    }
+  },
   onReminderDue: (
     cb: (payload: { noteId: string; repeat: 'none' | 'daily' }) => void
   ) => {

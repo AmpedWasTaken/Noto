@@ -15,6 +15,9 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    const offQuick = window.noto.onQuickAdd(() => {
+      useNoteStore.getState().addNote()
+    })
     const offRem = window.noto.onReminderDue((payload) => {
       const { notes: list, updateNote } = useNoteStore.getState()
       const n = list.find((x) => x.id === payload.noteId)
@@ -34,6 +37,7 @@ export default function App() {
       }
     })
     return () => {
+      offQuick()
       offRem()
     }
   }, [])

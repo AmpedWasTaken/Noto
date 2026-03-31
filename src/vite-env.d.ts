@@ -7,6 +7,7 @@ declare global {
     noto: {
       ipc: Record<string, IpcChannel>
       invoke: (channel: IpcChannel, ...args: unknown[]) => Promise<unknown>
+      onQuickAdd: (cb: () => void) => () => void
       onReminderDue: (
         cb: (payload: { noteId: string; repeat: 'none' | 'daily' }) => void
       ) => () => void
