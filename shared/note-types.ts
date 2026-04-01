@@ -40,6 +40,9 @@ export interface Note {
   height: number
   type: NoteType
   pinLevel: PinLevel
+  /** Ingeklapt: alleen titelregel zichtbaar. */
   miniMode: boolean
+  /** Hoogte vóór inklappen; wordt hersteld bij uitklappen. */
+  heightExpanded: number
   reminder: NoteReminder | null
 }

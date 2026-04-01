@@ -24,6 +24,7 @@ export function createDefaultNote(): Note {
     type: 'work',
     pinLevel: 'alwaysOnTop',
     miniMode: false,
+    heightExpanded: 320,
     reminder: null
   }
 }
@@ -37,7 +38,8 @@ export function createSupportNote(): Note {
     x: pos.x,
     y: pos.y,
     width: SUPPORT_CARD.width,
-    height: SUPPORT_CARD.height
+    height: SUPPORT_CARD.height,
+    heightExpanded: SUPPORT_CARD.height
   }
 }
 

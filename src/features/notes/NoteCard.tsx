@@ -10,8 +10,9 @@ import type { Note, NoteCategory } from '@shared/note-types'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { HeadsetIcon } from '@/components/icons/HeadsetIcon'
 import { PencilIcon } from '@/components/icons/PencilIcon'
-import { ReminderSection } from '@/features/reminders/ReminderSection'
+import { NudgeSection } from '@/features/reminders/NudgeSection'
 import { NoteChecklist } from '@/features/notes/NoteChecklist'
+import { noteCardTitle } from '@/features/notes/note-title'
 import { SupportCallForm } from '@/features/notes/SupportCallForm'
 import {
   emptySupportCall,
@@ -26,6 +27,7 @@ type Props = {
 const MIN_W = 200
 const MIN_H = 120
 const SNAP = 14
+const COLLAPSED_H = 52
 
 type ResizeKind = 'se' | 's' | 'e'
 
@@ -88,8 +90,10 @@ export function NoteCard({ note }: Props) {
           supportCall: sc,
           width: SUPPORT_CARD.width,
           height: SUPPORT_CARD.height,
+          heightExpanded: SUPPORT_CARD.height,
           x: Math.min(Math.max(note.x, 0), maxX),
-          y: Math.min(Math.max(note.y, 0), maxY)
+          y: Math.min(Math.max(note.y, 0), maxY),
+          miniMode: false
         })
       } else {
         const merged =
@@ -104,12 +108,29 @@ export function NoteCard({ note }: Props) {
           x: 48,
           y: 48,
           width: 320,
-          height: 320
+          height: 320,
+          heightExpanded: 320,
+          miniMode: false
         })
       }
     },
     [note.content, note.id, note.supportCall, updateNote]
   )
+
+  const collapse = useCallback(() => {
+    updateNote(note.id, {
+      miniMode: true,
+      heightExpanded: Math.max(MIN_H, note.height),
+      height: COLLAPSED_H
+    })
+  }, [note.height, note.id, updateNote])
+
+  const expand = useCallback(() => {
+    updateNote(note.id, {
+      miniMode: false,
+      height: Math.max(MIN_H, note.heightExpanded ?? 320)
+    })
+  }, [note.heightExpanded, note.id, updateNote])
 
   const applySnap = useCallback(
     (x: number, y: number, w: number, h: number) => {
@@ -152,14 +173,14 @@ export function NoteCard({ note }: Props) {
         if (r.kind === 's' || r.kind === 'se') {
           h = clamp(r.origH + dh, MIN_H, window.innerHeight - n.y)
         }
-        updateNote(id, { width: w, height: h })
+        updateNote(id, { width: w, height: h, heightExpanded: h })
       }
     }
     const onUp = () => {
       if (dragRef.current) {
         dragRef.current = null
         const n = useNoteStore.getState().notes.find((x) => x.id === id)
-        if (n) {
+        if (n && !n.miniMode) {
           const { nx, ny } = applySnap(n.x, n.y, n.width, n.height)
           updateNote(id, { x: nx, y: ny })
         }
@@ -207,6 +228,8 @@ export function NoteCard({ note }: Props) {
     setConfirmDelete(false)
   }, [note.id, removeNote])
 
+  const collapsed = note.miniMode
+
   return (
     <div
       className={`pointer-events-auto absolute flex flex-col overflow-hidden rounded-xl border border-white/10 border-l-[3px] bg-[#1e222c] shadow-noto transition-shadow duration-200 ease-out hover:shadow-lg ${categoryAccent(cat)}`}
@@ -214,100 +237,146 @@ export function NoteCard({ note }: Props) {
         left: note.x,
         top: note.y,
         width: note.width,
-        height: note.height
+        height: collapsed ? COLLAPSED_H : note.height
       }}
     >
-      <header
-        className="flex shrink-0 cursor-grab select-none items-center gap-2 border-b border-white/10 bg-[#232730] px-2 py-2 active:cursor-grabbing"
-        onPointerDown={onHeaderPointerDown}
-      >
-        <span
-          className="flex shrink-0 items-center justify-center text-noto-muted"
-          title={cat === 'support' ? 'Support' : 'Notitie'}
+      {collapsed ? (
+        <header
+          className="flex h-full shrink-0 cursor-grab select-none items-center gap-2 border-b border-transparent bg-[#232730] px-2 py-1.5 active:cursor-grabbing"
+          onPointerDown={onHeaderPointerDown}
         >
-          {cat === 'support' ? (
-            <HeadsetIcon className="h-4 w-4 text-emerald-400/90" />
-          ) : (
-            <PencilIcon className="h-4 w-4" />
-          )}
-        </span>
-        <span className="min-w-0 flex-1" />
-        <button
-          type="button"
-          title="Remove note"
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-lg leading-none text-noto-muted hover:bg-red-500/20 hover:text-red-200"
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={() => setConfirmDelete(true)}
-        >
-          ×
-        </button>
-      </header>
-
-      <div className="flex shrink-0 gap-1 border-b border-white/10 bg-[#1e222c] px-2 py-1.5">
-        <button
-          type="button"
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={() => setCategory('note')}
-          className={`flex-1 rounded-md py-1 text-[11px] font-medium transition-colors ${
-            cat === 'note'
-              ? 'bg-white/12 text-noto-text'
-              : 'text-noto-muted hover:bg-white/[0.06]'
-          }`}
-        >
-          Notitie
-        </button>
-        <button
-          type="button"
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={() => setCategory('support')}
-          className={`flex-1 rounded-md py-1 text-[11px] font-medium transition-colors ${
-            cat === 'support'
-              ? 'bg-emerald-500/20 text-emerald-100'
-              : 'text-noto-muted hover:bg-white/[0.06]'
-          }`}
-        >
-          Support
-        </button>
-      </div>
-
-      {cat === 'support' && note.supportCall ? (
-        <SupportCallForm note={note} />
+          <span className="flex shrink-0 items-center justify-center text-noto-muted">
+            {cat === 'support' ? (
+              <HeadsetIcon className="h-4 w-4 text-emerald-400/90" />
+            ) : (
+              <PencilIcon className="h-4 w-4" />
+            )}
+          </span>
+          <span className="min-w-0 flex-1 truncate text-[13px] text-noto-text" title={noteCardTitle(note)}>
+            {noteCardTitle(note)}
+          </span>
+          <button
+            type="button"
+            className="shrink-0 rounded px-2 py-0.5 text-[11px] text-noto-muted hover:bg-white/10"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={expand}
+          >
+            Uitklappen
+          </button>
+          <button
+            type="button"
+            title="Remove note"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-lg leading-none text-noto-muted hover:bg-red-500/20 hover:text-red-200"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={() => setConfirmDelete(true)}
+          >
+            ×
+          </button>
+        </header>
       ) : (
-        <textarea
-          className="min-h-0 flex-1 resize-none bg-[#1a1d26] px-3 py-2 text-[13px] leading-relaxed text-noto-text placeholder:text-noto-muted/50 focus:outline-none"
-          placeholder="Type something…"
-          spellCheck
-          value={note.content}
-          onChange={onChange}
-        />
+        <>
+          <header
+            className="flex shrink-0 cursor-grab select-none items-center gap-2 border-b border-white/10 bg-[#232730] px-2 py-2 active:cursor-grabbing"
+            onPointerDown={onHeaderPointerDown}
+          >
+            <span
+              className="flex shrink-0 items-center justify-center text-noto-muted"
+              title={cat === 'support' ? 'Support' : 'Notitie'}
+            >
+              {cat === 'support' ? (
+                <HeadsetIcon className="h-4 w-4 text-emerald-400/90" />
+              ) : (
+                <PencilIcon className="h-4 w-4" />
+              )}
+            </span>
+            <span className="min-w-0 flex-1" />
+            <button
+              type="button"
+              title="Inklappen"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-noto-muted hover:bg-white/10"
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={collapse}
+            >
+              −
+            </button>
+            <button
+              type="button"
+              title="Remove note"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-lg leading-none text-noto-muted hover:bg-red-500/20 hover:text-red-200"
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={() => setConfirmDelete(true)}
+            >
+              ×
+            </button>
+          </header>
+
+          <div className="flex shrink-0 gap-1 border-b border-white/10 bg-[#1e222c] px-2 py-1.5">
+            <button
+              type="button"
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={() => setCategory('note')}
+              className={`flex-1 rounded-md py-1 text-[11px] font-medium transition-colors ${
+                cat === 'note'
+                  ? 'bg-white/12 text-noto-text'
+                  : 'text-noto-muted hover:bg-white/[0.06]'
+              }`}
+            >
+              Notitie
+            </button>
+            <button
+              type="button"
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={() => setCategory('support')}
+              className={`flex-1 rounded-md py-1 text-[11px] font-medium transition-colors ${
+                cat === 'support'
+                  ? 'bg-emerald-500/20 text-emerald-100'
+                  : 'text-noto-muted hover:bg-white/[0.06]'
+              }`}
+            >
+              Support
+            </button>
+          </div>
+
+          {cat === 'support' && note.supportCall ? (
+            <SupportCallForm note={note} />
+          ) : (
+            <textarea
+              className="min-h-0 flex-1 resize-none bg-[#1a1d26] px-3 py-2 text-[13px] leading-relaxed text-noto-text placeholder:text-noto-muted/50 focus:outline-none"
+              placeholder="Type something…"
+              spellCheck
+              value={note.content}
+              onChange={onChange}
+            />
+          )}
+
+          {cat === 'note' ? <NoteChecklist note={note} /> : null}
+          <NudgeSection note={note} />
+
+          <button
+            type="button"
+            aria-label="Resize height"
+            className="absolute bottom-0 left-0 right-6 h-2 cursor-ns-resize touch-none bg-transparent"
+            onPointerDown={startResize('s')}
+          />
+          <button
+            type="button"
+            aria-label="Resize width"
+            className="absolute right-0 top-0 bottom-6 w-2 cursor-ew-resize touch-none bg-transparent"
+            onPointerDown={startResize('e')}
+          />
+          <button
+            type="button"
+            aria-label="Resize note"
+            className="absolute bottom-0 right-0 flex h-6 w-6 cursor-nwse-resize touch-none items-end justify-end p-0.5"
+            onPointerDown={startResize('se')}
+          >
+            <span
+              className="pointer-events-none block h-3 w-3 rounded-br-md border-b-2 border-r-2 border-white/25"
+              aria-hidden
+            />
+          </button>
+        </>
       )}
-
-      {cat === 'note' ? <NoteChecklist note={note} /> : null}
-      {cat === 'note' ? <ReminderSection note={note} /> : null}
-
-      <button
-        type="button"
-        aria-label="Resize height"
-        className="absolute bottom-0 left-0 right-6 h-2 cursor-ns-resize touch-none bg-transparent"
-        onPointerDown={startResize('s')}
-      />
-      <button
-        type="button"
-        aria-label="Resize width"
-        className="absolute right-0 top-0 bottom-6 w-2 cursor-ew-resize touch-none bg-transparent"
-        onPointerDown={startResize('e')}
-      />
-      <button
-        type="button"
-        aria-label="Resize note"
-        className="absolute bottom-0 right-0 flex h-6 w-6 cursor-nwse-resize touch-none items-end justify-end p-0.5"
-        onPointerDown={startResize('se')}
-      >
-        <span
-          className="pointer-events-none block h-3 w-3 rounded-br-md border-b-2 border-r-2 border-white/25"
-          aria-hidden
-        />
-      </button>
 
       <ConfirmDialog
         open={confirmDelete}

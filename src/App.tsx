@@ -45,14 +45,14 @@ export default function App() {
   const showNotes = ready && hydrated
 
   return (
-    <div className="relative min-h-screen bg-transparent text-noto-text">
+    <div className="pointer-events-none relative min-h-screen bg-transparent text-noto-text">
       {!showNotes ? (
         <div className="pointer-events-none p-6 text-sm text-noto-muted">Starting…</div>
       ) : (
         <>
           <OverlayControls />
           {notes.length === 0 ? (
-            <div className="pointer-events-none fixed left-1/2 top-24 z-[500] -translate-x-1/2 rounded-lg border border-white/10 bg-[#1e222c] px-4 py-3 text-center text-sm text-noto-muted shadow-noto">
+            <div className="pointer-events-auto fixed left-1/2 top-24 z-[500] -translate-x-1/2 rounded-lg border border-white/10 bg-[#1e222c] px-4 py-3 text-center text-sm text-noto-muted shadow-noto">
               No notes — press{' '}
               <kbd className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[11px] text-noto-text">
                 Ctrl+Shift+N

@@ -4,7 +4,7 @@ import { useNoteStore } from '@/store/note-store'
 
 export function OverlayControls() {
   const addSupportNote = useNoteStore((s) => s.addSupportNote)
-  const [pinned, setPinned] = useState(true)
+  const [pinned, setPinned] = useState(false)
 
   useEffect(() => {
     void window.noto.invoke(IPC.GET_ALWAYS_ON_TOP).then((v) => {

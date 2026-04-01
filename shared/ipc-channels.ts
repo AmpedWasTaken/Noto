@@ -9,7 +9,9 @@ export const IPC = {
   CREATE_NOTE: 'noto:create-note',
   SCHEDULE_REMINDERS: 'noto:schedule-reminders',
   SNOOZE_REMINDER: 'noto:snooze-reminder',
-  REGISTER_SHORTCUT: 'noto:register-shortcut'
+  REGISTER_SHORTCUT: 'noto:register-shortcut',
+  /** Directe vriendelijke melding (geen schema). */
+  NUDGE_NOTE: 'noto:nudge-note'
 } as const
 
 export type IpcChannel = (typeof IPC)[keyof typeof IPC]

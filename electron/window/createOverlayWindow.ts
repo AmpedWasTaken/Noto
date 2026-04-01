@@ -17,7 +17,8 @@ export function createOverlayWindow(getPreloadPath: PreloadPathFn): BrowserWindo
     backgroundColor: '#00000000',
     hasShadow: false,
     skipTaskbar: true,
-    alwaysOnTop: true,
+    /** Let other apps come in front; use the “On top” control to pin when needed. */
+    alwaysOnTop: false,
     webPreferences: {
       preload: getPreloadPath(),
       contextIsolation: true,

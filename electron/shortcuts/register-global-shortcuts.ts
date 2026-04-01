@@ -1,7 +1,17 @@
 import { app, globalShortcut, type BrowserWindow } from 'electron'
 import { IPC_EVENTS } from '@shared/ipc-channels'
 
-/** Ctrl+Shift+N quick-add; Ctrl+Shift+H hide/show overlay window. */
+function sendQuickAdd(getWindow: () => BrowserWindow | null): void {
+  const w = getWindow()
+  if (!w || w.isDestroyed()) return
+  if (!w.isVisible()) {
+    w.show()
+  }
+  w.focus()
+  w.webContents.send(IPC_EVENTS.QUICK_ADD)
+}
+
+/** Ctrl+Shift+N (of Cmd+Shift+N) nieuwe notitie; Ctrl+Alt+N als reserve. Overlay verborgen → weer tonen. */
 export function registerGlobalShortcuts(getWindow: () => BrowserWindow | null): void {
   const reg = (accelerator: string, fn: () => void) => {
     if (!globalShortcut.register(accelerator, fn)) {
@@ -9,10 +19,9 @@ export function registerGlobalShortcuts(getWindow: () => BrowserWindow | null): 
     }
   }
 
-  reg('CommandOrControl+Shift+N', () => {
-    const w = getWindow()
-    if (w && !w.isDestroyed()) w.webContents.send(IPC_EVENTS.QUICK_ADD)
-  })
+  const quick = () => sendQuickAdd(getWindow)
+  reg('CommandOrControl+Shift+N', quick)
+  reg('CommandOrControl+Alt+N', quick)
 
   reg('CommandOrControl+Shift+H', () => {
     const w = getWindow()

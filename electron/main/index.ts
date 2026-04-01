@@ -54,8 +54,8 @@ if (!gotLock) {
     registerIpcHandlers(() => mainWindow)
     void loadNotesState().then((state) => setNotesForReminders(state.notes))
     startReminderScheduler(() => mainWindow)
-    registerGlobalShortcuts(() => mainWindow)
     createWindow()
+    registerGlobalShortcuts(() => mainWindow)
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) createWindow()
     })

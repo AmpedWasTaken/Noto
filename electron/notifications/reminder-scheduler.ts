@@ -41,7 +41,9 @@ async function tick(getWindow: () => BrowserWindow | null): Promise<void> {
       note.supportCall?.issue?.trim() ||
       note.supportCall?.contactName?.trim() ||
       note.content.trim()
-    const body = preview.slice(0, 140) || 'Reminder'
+    const body = preview
+      ? `Ben je hier al klaar mee? — ${preview.slice(0, 120)}`
+      : 'Ben je hier al klaar mee?'
     if (Notification.isSupported()) {
       const n = new Notification({
         title: 'Noto',

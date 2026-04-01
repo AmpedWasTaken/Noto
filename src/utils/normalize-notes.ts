@@ -1,6 +1,8 @@
 import type { Note, NoteTask, NoteCategory, SupportCallData } from '@shared/note-types'
 import { emptySupportCall } from '@/features/notes/support-defaults'
 
+const MIN_NOTE_HEIGHT = 120
+
 function asTasks(raw: unknown): NoteTask[] {
   if (!Array.isArray(raw)) return []
   return raw
@@ -42,11 +44,22 @@ export function normalizeNote(n: Note): Note {
   if (category === 'note') {
     supportCall = null
   }
+  const looseN = n as Note & { miniMode?: unknown; heightExpanded?: unknown }
+  const miniMode = typeof looseN.miniMode === 'boolean' ? looseN.miniMode : false
+  const heightExpanded =
+    typeof looseN.heightExpanded === 'number' && looseN.heightExpanded >= MIN_NOTE_HEIGHT
+      ? looseN.heightExpanded
+      : typeof n.height === 'number'
+        ? n.height
+        : 320
+
   return {
     ...n,
     tasks: asTasks((n as { tasks?: unknown }).tasks),
     category,
-    supportCall
+    supportCall,
+    miniMode,
+    heightExpanded
   }
 }
 
