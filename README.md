@@ -26,7 +26,7 @@ While Noto is running, press **Ctrl+Shift+N** (Windows/Linux) or **Cmd+Shift+N**
 
 ### Hide overlay
 
-Press **Ctrl+Shift+H** to hide or show the Noto window, or use the **Hide** control in the top-right bar. When hidden, use **Ctrl+Shift+H** again to bring Noto back. Reminders are still checked in the background; your notes are flushed to disk when you hide so notifications keep working.
+Press **Ctrl+Shift+H** to hide or show the Noto window, or use the **Hide** control in the top-right bar. When hidden, use **Ctrl+Shift+H** again to bring Noto back. **Scheduled seintjes (“Over 1 uur”) still fire as Windows/macOS notifications** — the main process reads your saved notes every ~45s, so Noto does not need to be visible. **Click a notification** to show Noto and open that card. Your notes are flushed when you hide so reminders stay in sync.
 
 ### Notes UI
 
@@ -34,7 +34,7 @@ Drag a note by its header. Resize using the **bottom edge** (height), **right ed
 
 Each card can be a simple **note** or a **support** entry: name, optional company, website, phone, and a short description (“wat er aan de hand is”). Use **Notitie** / **Support** on the card to switch, or **+ Support** in the top bar for a new support card. Support opens as a normal-sized card (no full-screen); drag and resize like other notes.
 
-Use **Inklappen** on a card to show only the title in a compact strip; **Uitklappen** restores the full card. On **Notitie** cards, **Nu** sends a quick native nudge (“did you finish this?”), and **Over 1 uur** schedules a background reminder; you can clear the scheduled time with **Gepland wissen**.
+Use **−** on a card to **hide** it from the overlay (it stays in **Overzicht** on the left — click a row to show it again). On **Notitie** cards, **Nu** sends an immediate system nudge (friendly Dutch lines like “Is dit al gedaan?” / “Ben je hier al klaar mee?” with a snippet of the note). **Over 1 uur** schedules the same style of notification later — useful when the overlay is hidden so things are not “out of sight, out of mind.” Clear the schedule with **Gepland wissen**. If you see no toasts, check OS notification permissions / Focus Assist (Windows).
 
 ### Data
 

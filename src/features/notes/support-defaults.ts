@@ -1,9 +1,9 @@
 import type { SupportCallData } from '@shared/note-types'
 
-/** Vaste kaartgrootte: alles past in flex-layout zonder scroll op de buitenkant. */
+/** Vaste kaartgrootte: voldoende hoogte voor formulier + issue-veld. */
 export const SUPPORT_CARD = {
-  width: 400,
-  height: 480
+  width: 420,
+  height: 620
 } as const
 
 export function emptySupportCall(): SupportCallData {

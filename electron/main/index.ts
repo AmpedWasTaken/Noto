@@ -30,6 +30,7 @@ function createWindow(): void {
   mainWindow.on('hide', () => {
     const w = mainWindow
     if (w && !w.isDestroyed()) {
+      w.setIgnoreMouseEvents(false)
       w.webContents.send(IPC_EVENTS.FLUSH_SAVE)
     }
   })

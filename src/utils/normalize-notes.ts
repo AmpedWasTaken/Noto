@@ -44,8 +44,16 @@ export function normalizeNote(n: Note): Note {
   if (category === 'note') {
     supportCall = null
   }
-  const looseN = n as Note & { miniMode?: unknown; heightExpanded?: unknown }
-  const miniMode = typeof looseN.miniMode === 'boolean' ? looseN.miniMode : false
+  const looseN = n as Note & {
+    miniMode?: unknown
+    heightExpanded?: unknown
+    stackOrder?: unknown
+    hidden?: unknown
+  }
+  const stackOrder =
+    typeof looseN.stackOrder === 'number' && Number.isFinite(looseN.stackOrder)
+      ? looseN.stackOrder
+      : 0
   const heightExpanded =
     typeof looseN.heightExpanded === 'number' && looseN.heightExpanded >= MIN_NOTE_HEIGHT
       ? looseN.heightExpanded
@@ -53,13 +61,25 @@ export function normalizeNote(n: Note): Note {
         ? n.height
         : 320
 
+  const hadMiniMode = looseN.miniMode === true
+  let height =
+    typeof n.height === 'number' && Number.isFinite(n.height) ? n.height : heightExpanded
+  if (hadMiniMode || height < MIN_NOTE_HEIGHT) {
+    height = Math.max(MIN_NOTE_HEIGHT, heightExpanded)
+  }
+
+  const hidden = looseN.hidden === true
+
   return {
     ...n,
     tasks: asTasks((n as { tasks?: unknown }).tasks),
     category,
     supportCall,
-    miniMode,
-    heightExpanded
+    miniMode: false,
+    stackOrder,
+    heightExpanded,
+    height,
+    hidden
   }
 }
 

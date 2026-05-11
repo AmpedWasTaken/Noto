@@ -1,14 +1,19 @@
 import { useEffect, useState } from 'react'
 import { IPC } from '@shared/ipc-channels'
+import { NotesOverviewList } from '@/components/NotesOverviewList'
+import { OverlayChromeClassSync } from '@/components/OverlayChromeClassSync'
 import { OverlayControls } from '@/components/OverlayControls'
 import { NoteCard } from '@/features/notes/NoteCard'
 import { useNotesPersistence } from '@/hooks/use-notes-persistence'
+import { useOverlayPointerPassthrough } from '@/hooks/use-overlay-pointer-passthrough'
 import { useNoteStore } from '@/store/note-store'
 
 export default function App() {
   const [ready, setReady] = useState(false)
+  const [emptyHintDismissed, setEmptyHintDismissed] = useState(false)
   const hydrated = useNotesPersistence()
   const notes = useNoteStore((s) => s.notes)
+  useOverlayPointerPassthrough()
 
   useEffect(() => {
     void window.noto.invoke(IPC.READY).then(() => setReady(true))
@@ -36,13 +41,28 @@ export default function App() {
         updateNote(payload.noteId, { reminder: null })
       }
     })
+    const offNotify = window.noto.onOpenNoteFromNotify(({ noteId }) => {
+      useNoteStore.getState().openNoteFromOverview(noteId)
+    })
     return () => {
       offQuick()
       offRem()
+      offNotify()
     }
   }, [])
 
   const showNotes = ready && hydrated
+
+  useEffect(() => {
+    if (!showNotes) return
+    if (notes.length > 0) {
+      setEmptyHintDismissed(false)
+      return
+    }
+    setEmptyHintDismissed(false)
+    const id = window.setTimeout(() => setEmptyHintDismissed(true), 5000)
+    return () => window.clearTimeout(id)
+  }, [showNotes, notes.length])
 
   return (
     <div className="pointer-events-none relative min-h-screen bg-transparent text-noto-text">
@@ -50,18 +70,28 @@ export default function App() {
         <div className="pointer-events-none p-6 text-sm text-noto-muted">Starting…</div>
       ) : (
         <>
+          <OverlayChromeClassSync />
+          <div className="pointer-events-none absolute inset-0 z-[100]">
+            {notes.length > 0
+              ? notes
+                  .filter((note) => !note.hidden)
+                  .map((note) => <NoteCard key={note.id} note={note} />)
+              : null}
+          </div>
+          <NotesOverviewList />
           <OverlayControls />
-          {notes.length === 0 ? (
-            <div className="pointer-events-auto fixed left-1/2 top-24 z-[500] -translate-x-1/2 rounded-lg border border-white/10 bg-[#1e222c] px-4 py-3 text-center text-sm text-noto-muted shadow-noto">
+          {notes.length === 0 && !emptyHintDismissed ? (
+            <div
+              data-noto-interactive
+              className="noto-chrome-surface pointer-events-auto fixed left-1/2 top-24 z-[500] -translate-x-1/2 rounded-lg border border-white/10 bg-[#1e222c] px-4 py-3 text-center text-sm text-noto-muted shadow-noto"
+            >
               No notes — press{' '}
               <kbd className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[11px] text-noto-text">
                 Ctrl+Shift+N
               </kbd>{' '}
               to add one
             </div>
-          ) : (
-            notes.map((note) => <NoteCard key={note.id} note={note} />)
-          )}
+          ) : null}
         </>
       )}
     </div>

@@ -40,7 +40,11 @@ export interface Note {
   height: number
   type: NoteType
   pinLevel: PinLevel
-  /** Ingeklapt: alleen titelregel zichtbaar. */
+  /** Stapelvolgorde voor z-index (hoger = bovenop). */
+  stackOrder: number
+  /** Verborgen: geen kaart op het scherm; open weer via Overzicht. */
+  hidden: boolean
+  /** Legacy; altijd false na normalisatie. */
   miniMode: boolean
   /** Hoogte vóór inklappen; wordt hersteld bij uitklappen. */
   heightExpanded: number

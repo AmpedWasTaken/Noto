@@ -1,4 +1,5 @@
 import { app } from 'electron'
+import { writeFileSync } from 'node:fs'
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import {
@@ -28,4 +29,9 @@ export async function loadNotesState(): Promise<PersistedNotesState> {
 export async function saveNotesState(state: PersistedNotesState): Promise<void> {
   const body = JSON.stringify(state, null, 2)
   await writeFile(dataPath(), body, 'utf-8')
+}
+
+/** Same as saveNotesState but synchronous (window close / hide before process ends). */
+export function saveNotesStateSync(state: PersistedNotesState): void {
+  writeFileSync(dataPath(), JSON.stringify(state, null, 2), 'utf-8')
 }

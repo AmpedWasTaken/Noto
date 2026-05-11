@@ -21,7 +21,7 @@ export function NudgeSection({ note }: { note: Note }) {
   const updateNote = useNoteStore((s) => s.updateNote)
 
   const nudgeNow = useCallback(() => {
-    void window.noto.invoke(IPC.NUDGE_NOTE, previewForNudge(note))
+    void window.noto.invoke(IPC.NUDGE_NOTE, previewForNudge(note), note.id)
   }, [note])
 
   const nudgeInOneHour = useCallback(() => {
@@ -40,13 +40,17 @@ export function NudgeSection({ note }: { note: Note }) {
       <p className="text-[10px] font-medium uppercase tracking-wide text-noto-muted">
         Seintje
       </p>
+      <p className="text-[10px] leading-snug text-noto-muted/85">
+        Systeemmeldingen werken ook als Noto verborgen is (Ctrl+Shift+H). Zo blijft het
+        zichtbaar buiten je scherm. Klik op een melding om de kaart weer te openen.
+      </p>
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
           className="rounded-md bg-white/[0.08] px-2.5 py-1 text-[11px] text-noto-text hover:bg-white/[0.12]"
           onClick={nudgeNow}
         >
-          Nu: “ben je dit al afgerond?”
+          Nu: “heb je dit al afgerond?”
         </button>
         <button
           type="button"

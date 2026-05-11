@@ -1,7 +1,9 @@
 import { Notification, type BrowserWindow } from 'electron'
 import type { Note } from '@shared/note-types'
 import { IPC_EVENTS } from '@shared/ipc-channels'
+import { composeNudgeBody, truncatePreview } from '@shared/nudge-messages'
 import { loadNotesState } from '../main/notes-persistence'
+import { attachNotificationOpenNote } from './attach-notification-open-note'
 
 let notesRef: Note[] = []
 const cooling = new Set<string>()
@@ -37,19 +39,18 @@ async function tick(getWindow: () => BrowserWindow | null): Promise<void> {
     cooling.add(note.id)
     setTimeout(() => cooling.delete(note.id), 5000)
 
-    const preview =
+    const previewRaw =
       note.supportCall?.issue?.trim() ||
       note.supportCall?.contactName?.trim() ||
       note.content.trim()
-    const body = preview
-      ? `Ben je hier al klaar mee? — ${preview.slice(0, 120)}`
-      : 'Ben je hier al klaar mee?'
+    const body = composeNudgeBody(truncatePreview(previewRaw), note.id)
     if (Notification.isSupported()) {
       const n = new Notification({
-        title: 'Noto',
+        title: 'Noto — herinnering',
         body,
         silent: false
       })
+      attachNotificationOpenNote(n, getWindow, note.id)
       n.show()
     }
 

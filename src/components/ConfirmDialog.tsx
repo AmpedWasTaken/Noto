@@ -23,6 +23,7 @@ export function ConfirmDialog({
 
   return (
     <div
+      data-noto-interactive
       className="pointer-events-auto fixed inset-0 z-[2000] flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm"
       role="presentation"
       onMouseDown={(e) => {

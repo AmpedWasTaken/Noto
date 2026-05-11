@@ -26,3 +26,13 @@ body {
     Roboto,
     sans-serif;
 }
+
+/* Softer top bar while pinned “On top”; blijft leesbaar (geen extreem lage opacity). */
+html.noto-aot-dim .noto-chrome-surface {
+  opacity: 0.94;
+  transition: opacity 0.2s ease;
+}
+
+html.noto-aot-dim .noto-chrome-surface:hover {
+  opacity: 1;
+}
